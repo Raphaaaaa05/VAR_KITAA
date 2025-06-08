@@ -11,7 +11,7 @@
  
 
 
-[![Typing SVG](https://readme-typing-svg.herokuapp.com?font=Fira+Code&pause=1000&color=000000&width=435&lines=𝑀𝐴𝐷𝐸+𝐵𝑌+𝐕𝐀𝐑 𝐊𝐈𝐓𝐀𝐀+2025)](https://git.io/typing-svg)
+[![Typing SVG](https://readme-typing-svg.herokuapp.com?font=Fira+Code&pause=1000&color=000000&width=435&lines=𝑀𝐴𝐷𝐸+𝐵𝑌+𝑉𝐴𝑅+𝐾𝐼𝑇𝐴𝐴+2025)](https://git.io/typing-svg)
 
 
 
