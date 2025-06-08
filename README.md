@@ -28,3 +28,10 @@
  
 _________________
 <a href='https://rahmani-4.onrender.com' target="_blank"><img alt='DEPLOY' src='https://img.shields.io/badge/PAIR-CODE-h?color=navy&style=for-the-badge&logo=visualstudiocode'/></a></p>
+
+### ᴅᴇᴘʟᴏʏ ᴛᴏ ʜᴇʀᴏᴋᴜ
+*****
+ **𝘊𝘳𝘦𝘢𝘵𝘦 𝘢𝘯 𝘢𝘤𝘤𝘰𝘶𝘯𝘵.**
+    <br>
+<a href='https://dashboard.heroku.com/' target="_blank"><img alt='Heroku' src='https://img.shields.io/badge/-Create-purple?style=for-the-badge&logo=heroku&logoColor=white'/></a>
+****
