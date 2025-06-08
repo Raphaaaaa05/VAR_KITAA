@@ -25,6 +25,6 @@
 
 **REMEMBER TO STAR ✨ THE REPO and FORK IT FOR UPDATES*
 
-**PAIR CODE* 
+ 
 _________________
 <a href='https://rahmani-4.onrender.com' target="_blank"><img alt='DEPLOY' src='https://img.shields.io/badge/PAIR-CODE-h?color=navy&style=for-the-badge&logo=visualstudiocode'/></a></p>
