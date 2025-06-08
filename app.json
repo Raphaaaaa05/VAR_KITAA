@@ -1,5 +1,5 @@
 {
-  "name":"???? ??????",
+  "name":"VAR KITAA",
   "description":"Best whatsapp bot developed by Rahmani",
   "keywords":["bot","node","baileys","whatsapp"],
   "logo":"https://files.catbox.moe/5u3a1c.jpg",
@@ -72,7 +72,7 @@
     "BOT_NAME" : {
        
       "description":"put A name for your bot",
-      "value":"???? ??????",
+      "value":"𝑉𝐴𝑅 𝐾𝐼𝑇𝐴𝐴",
       "required":false
 
     } ,
