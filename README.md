@@ -23,7 +23,7 @@
 
 <a href="https://github.com/Raphaaaaa05/VAR_KITAA/forks"><img title="Tap Here Open Session Site" src="https://img.shields.io/badge/FORK THIS REPO-h?color=black&style=for-the-badge&logo=msi" width="100" height="38.45"/></a></p>
 
-**REMEMBER TO STAR ✨ THE REPO and FORK IT FOR UPDATES*
+### REMEMBER TO STAR ✨ THE REPO and FORK IT FOR UPDATES
 
  
 _________________
