@@ -1224,7 +1224,7 @@ zk.ev.on("messages.upsert", async (m) => {
             
             var dev = [dj, dj2,dj3,luffy].map((t) => t.replace(/[^0-9]/g) + "@s.whatsapp.net").includes(auteurMessage);
             function repondre(mes) { zk.sendMessage(origineMessage, { text: mes }, { quoted: ms }); }
-            console.log("\t🌍ENB-XMD-BOT ONLINE🌍");
+            console.log("\t🌍VAR-KITAA-BOT ONLINE🌍");
             console.log("=========== written message===========");
             if (verifGroupe) {
                 console.log("message provenant du groupe : " + nomGroupe);
