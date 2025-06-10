@@ -44,7 +44,7 @@ _________________
 
 #### DEPLOY ON RENDER 
 3. `If You Don't Have An Account On Render`
-- <a href="https://dashboard.render.com/register"><img src="https://img.shields.io/badge/CREATE AN ACCOUNT NOW-h?color=red&style=for-the-badge&logo=msi" width="220" height="38.45"/></a></p>
+- <a href="https://dashboard.render.com/register"><img src="https://img.shields.io/badge/CREATE AN ACCOUNT NOW-h?color=darkblue&style=for-the-badge&logo=msi" width="220" height="38.45"/></a></p>
 
 4. `If You Have an account on Render`
 - <a href="https://render.com"><img title="Deploy Now" src="https://img.shields.io/badge/DEPLOY NOW-h?color=blur&style=for-the-badge&logo=msi" width="220" height="38.45"/></a></p>
