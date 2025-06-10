@@ -50,3 +50,12 @@ _________________
 - <a href="https://render.com"><img title="Deploy Now" src="https://img.shields.io/badge/DEPLOY NOW-h?color=blur&style=for-the-badge&logo=msi" width="220" height="38.45"/></a></p>
 
 <a><img src='https://i.imgur.com/LyHic3i.gif'/></a><a><img src='https://i.imgur.com/LyHic3i.gif'/></a>
+
+
+## 🌟 OUR CHANNEL SUPPORTER MAKE SURE U FOLLOW THE CHANNEL FOR UPDATES🪡🍁
+
+<div align="center">
+  <a href="https://whatsapp.com/channel/0029VasLXWp4tRs0xU9MDc47">
+    <img src="https://img.shields.io/badge/Join-WhatsApp%20Channel-25D366?style=for-the-badge&logo=whatsapp&logoColor=white&labelColor=000000"/>
+  </a>
+</div>
