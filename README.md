@@ -52,7 +52,7 @@ _________________
 <a><img src='https://i.imgur.com/LyHic3i.gif'/></a><a><img src='https://i.imgur.com/LyHic3i.gif'/></a>
 
 
-### 🌟 OUR CHANNEL SUPPORTER MAKE SURE U FOLLOW THE CHANNEL FOR UPDATES🪡🍁
+#### 🌟 OUR CHANNEL SUPPORTER MAKE SURE U FOLLOW THE CHANNEL FOR UPDATES🪡🍁
 
 <div align="center">
   <a href="https://whatsapp.com/channel/0029VasLXWp4tRs0xU9MDc47">
