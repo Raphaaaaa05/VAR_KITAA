@@ -59,3 +59,8 @@ _________________
     <img src="https://img.shields.io/badge/Join-WhatsApp%20Channel-25D366?style=for-the-badge&logo=whatsapp&logoColor=white&labelColor=000000"/>
   </a>
 </div>
+
+_________
+
+
+<a href="https://wa.me/+255742695219-INFO"><img title="CONTACT-Elon" src="https://img.shields.io/badge/CONTACT-VAR-KITAA?color=black&style=for-the-badge&logo=audi" width="240" height="45.45"/></a></p>
