@@ -21,7 +21,7 @@
 ## 1.FIRST STEP 
 
 
-<a href="https://github.com/Raphaaaaa05/VAR_KITAA/forks"><img title="Tap Here Open Session Site" src="https://img.shields.io/badge/FORK THIS REPO-h?color=black&style=for-the-badge&logo=msi" width="300" height="38.45"/></a></p>
+<a href="https://github.com/Raphaaaaa05/VAR_KITAA/forks"><img title="Tap Here Open Session Site" src="https://img.shields.io/badge/FORK THIS REPO-h?color=black&style=for-the-badge&logo=msi" width="220" height="38.45"/></a></p>
 
 ### REMEMBER TO STAR ✨ THE REPO and FORK IT FOR UPDATES
 
