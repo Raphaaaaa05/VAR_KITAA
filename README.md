@@ -63,4 +63,4 @@ _________________
 _________
 
 
-<a href="https://wa.me/+255742695219-INFO"><img title="CONTACT-Elon" src="https://img.shields.io/badge/CONTACT-VAR-KITAA?color=blue&style=for-the-badge&logo=audi" width="240" height="45.45"/></a></p>
+<a href="https://wa.me/+255742695219-INFO"><img title="CONTACT-Elon" src="https://img.shields.io/badge/CONTACT-VAR-KITAA?color=blue&style=for-the-badge&logo=audi" width="220" height="45.45"/></a></p>
