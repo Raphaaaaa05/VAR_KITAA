@@ -21,7 +21,7 @@
 ## 1.FIRST STEP 
 
 
-<a href="https://github.com/Raphaaaaa05/VAR_KITAA/forks"><img title="Tap Here Open Session Site" src="https://img.shields.io/badge/FORK THIS REPO-h?color=black&style=for-the-badge&logo=msi" width="100" height="38.45"/></a></p>
+<a href="https://github.com/Raphaaaaa05/VAR_KITAA/forks"><img title="Tap Here Open Session Site" src="https://img.shields.io/badge/FORK THIS REPO-h?color=black&style=for-the-badge&logo=msi" width="300" height="38.45"/></a></p>
 
 ### REMEMBER TO STAR ✨ THE REPO and FORK IT FOR UPDATES
 
@@ -63,4 +63,4 @@ _________________
 _________
 
 
-<a href="https://wa.me/+255742695219-INFO"><img title="CONTACT-Elon" src="https://img.shields.io/badge/CONTACT-VAR-KITAA?color=black&style=for-the-badge&logo=audi" width="240" height="45.45"/></a></p>
+<a href="https://wa.me/+255742695219-INFO"><img title="CONTACT-Elon" src="https://img.shields.io/badge/CONTACT-VAR-KITAA?color=blue&style=for-the-badge&logo=audi" width="240" height="45.45"/></a></p>
