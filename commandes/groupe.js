@@ -1,4 +1,3 @@
-
 const { zokou } = require("../framework/zokou")
 //const { getGroupe } = require("../bdd/groupe")
 const { Sticker, StickerTypes } = require('wa-sticker-formatter');
@@ -14,7 +13,7 @@ const { default: axios } = require('axios');
 
 
 
-zokou({ nomCom: "tagall", categorie: 'Group', reaction: "📣" }, async (dest, zk, commandeOptions) => {
+zokou({ nomCom: "tagall", categorie: 'Group', reaction: "🐝" }, async (dest, zk, commandeOptions) => {
 
   const { ms, repondre, arg, verifGroupe, nomGroupe, infosGroupe, nomAuteurMessage, verifAdmin, superUser } = commandeOptions
 
@@ -31,12 +30,12 @@ zokou({ nomCom: "tagall", categorie: 'Group', reaction: "📣" }, async (dest, z
   var tag = ""; 
   tag +=`
   
-╭─────────────────━┈⊷ 
-│⛔ ༺𝐕𝐀𝐑 𝐊𝐈𝐓𝐀𝐀༻ 𝓣𝓐𝓖𝓢
-╰─────────────────━┈⊷ \n
-│⭕ *Group* : ${nomGroupe} 
-│⭕ *Hey😀* : *${nomAuteurMessage}* 
-│⭕ *Message* : *${mess}* 
+╭─────────────━┈⊷ 
+│ ༺𝐕𝐀𝐑 𝐊𝐈𝐓𝐀𝐀༻ 𝓣𝓐𝓖
+╰─────────────━┈⊷ \n
+│👥 *Group* : ${nomGroupe} 
+│👤 *Hey😀* : *${nomAuteurMessage}* 
+│📜 *Message* : *${mess}* 
 ╰─────────────━┈⊷\n
 \n
 
@@ -73,7 +72,7 @@ zokou({ nomCom: "link", categorie: 'Group', reaction: "🙋" }, async (dest, zk,
 
   let mess = `hello ${nomAuteurMessage} , here is the group link for ${nomGroupe} \n
 
-Group link :${lien} \n\n©༺𝐕𝐀𝐑 𝐊𝐈𝐓𝐀𝐀༻ 𝐬𝐜𝐢𝐞𝐧𝐜𝐞`
+Group link :${lien} \n\n® ༺𝐕𝐀𝐑 𝐊𝐈𝐓𝐀𝐀༻ `
   repondre(mess)
 
 
@@ -413,7 +412,7 @@ zokou({ nomCom: "info", categorie: 'Group' }, async (dest, zk, commandeOptions) 
        repondre(error)
     }
 
-  } else { repondre('You are not entitled to this order') ;
+  } else { repondre('Not entitled to this order') ;
   }
 
 });
@@ -606,4 +605,5 @@ zokou({nomCom:"hidetag",categorie:'Group',reaction:"🎤"},async(dest,zk,command
   let metadata = await zk.groupMetadata(dest) ;
 
   //console.log(metadata.participants)
- let tag
+ let tag = [] ;
+  for (const partici
