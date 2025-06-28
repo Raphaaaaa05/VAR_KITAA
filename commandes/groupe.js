@@ -1,3 +1,5 @@
+
+
 const { zokou } = require("../framework/zokou")
 //const { getGroupe } = require("../bdd/groupe")
 const { Sticker, StickerTypes } = require('wa-sticker-formatter');
@@ -31,7 +33,7 @@ zokou({ nomCom: "tagall", categorie: 'Group', reaction: "🐝" }, async (dest, z
   tag +=`
   
 ╭─────────────━┈⊷ 
-│ ༺𝐕𝐀𝐑 𝐊𝐈𝐓𝐀𝐀༻ 𝓣𝓐𝓖
+│ VAR KITAA TAG
 ╰─────────────━┈⊷ \n
 │👥 *Group* : ${nomGroupe} 
 │👤 *Hey😀* : *${nomAuteurMessage}* 
@@ -72,7 +74,7 @@ zokou({ nomCom: "link", categorie: 'Group', reaction: "🙋" }, async (dest, zk,
 
   let mess = `hello ${nomAuteurMessage} , here is the group link for ${nomGroupe} \n
 
-Group link :${lien} \n\n® ༺𝐕𝐀𝐑 𝐊𝐈𝐓𝐀𝐀༻ `
+Group link :${lien} \n\n® VAR KITAA`
   repondre(mess)
 
 
@@ -606,4 +608,4 @@ zokou({nomCom:"hidetag",categorie:'Group',reaction:"🎤"},async(dest,zk,command
 
   //console.log(metadata.participants)
  let tag = [] ;
-  for (const partici
+  for (const participant of metadata.part
