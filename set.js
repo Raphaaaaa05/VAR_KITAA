@@ -1,5 +1,3 @@
-
-
 const fs = require('fs-extra');
 const { Sequelize } = require('sequelize');
 if (fs.existsSync('set.env'))
@@ -9,7 +7,9 @@ const databasePath = path.join(__dirname, './database.db');
 const DATABASE_URL = process.env.DATABASE_URL === undefined
     ? databasePath
     : process.env.DATABASE_URL;
-module.exports = { session: process.env.SESSION_ID || '',
+
+module.exports = { 
+    session: process.env.SESSION_ID || '',
     PREFIXE: process.env.PREFIX || ".",
     OWNER_NAME: process.env.OWNER_NAME || "Ibrahim Adams",
     NUMERO_OWNER : process.env.NUMERO_OWNER || " Ibrahim Adams",              
@@ -28,17 +28,23 @@ module.exports = { session: process.env.SESSION_ID || '',
     CHATBOT1 : process.env.AUDIO_CHATBOT || "no",
     CHATBOT2 : process.env.CHATBOT2 || "yes",
     ANTIDELETE1 : process.env.ANTI_DELETE_MESSAGE || 'no',
-    ANTICALL : process.env.ANTICALL || 'no',
-                  AUTO_REACT_STATUS : process.env.AUTO_REACT_STATUS || 'yes',
-                  AUTO_READ : process.env.AUTO_READ || 'yes',
-                  CHATBOT : process.env.CHATBOT || "yes",
-                  AUTO_BIO : process.env.AUTO_BIO || "yes",
-                  AUTO_REACT : process.env.AUTO_REACT || "yes",
+    ANTICALL : process.env.ANTICALL || 'no',           
+    AUTO_REACT_STATUS : process.env.AUTO_REACT_STATUS || 'yes',
+    AUTO_READ : process.env.AUTO_READ || 'yes',
+    CHATBOT : process.env.CHATBOT || "yes",
+    AUTO_BIO : process.env.AUTO_BIO || "yes",
+    AUTO_REACT : process.env.AUTO_REACT || "yes",
+    
+    // ============ FAL.AI API KEY ============
+    // Weka API key yako hapa - Pata kutoka https://fal.ai/dashboard
+    FAL_KEY: process.env.FAL_KEY || "ai.fal.client:fal-client:0.7.1",
+    
     DATABASE_URL,
     DATABASE: DATABASE_URL === databasePath
-        ? "postgresql://postgres:bKlIqoOUWFIHOAhKxRWQtGfKfhGKgmRX@viaduct.proxy.rlwy.net:47738/railway" : "postgresql://postgres:bKlIqoOUWFIHOAhKxRWQtGfKfhGKgmRX@viaduct.proxy.rlwy.net:47738/railway",
-   
+        ? "postgresql://postgres:bKlIqoOUWFIHOAhKxRWQtGfKfhGKgmRX@viaduct.proxy.rlwy.net:47738/railway" 
+        : "postgresql://postgres:bKlIqoOUWFIHOAhKxRWQtGfKfhGKgmRX@viaduct.proxy.rlwy.net:47738/railway",
 };
+
 let fichier = require.resolve(__filename);
 fs.watchFile(fichier, () => {
     fs.unwatchFile(fichier);
