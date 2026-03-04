@@ -5,434 +5,422 @@ const axios = require('axios');
 const { exec } = require('child_process');
 const util = require('util');
 const execPromise = util.promisify(exec);
+const path = require('path');
+const os = require('os');
 
 // ============================================
-// FAL.AI JAVA CLIENT INTEGRATION
+// FAL.AI JAVA CLIENT v0.7.1 INTEGRATION
 // ============================================
+
+// Configuration
+const JAVA_CLASS_NAME = "FalAIImageGenerator";
+const JAVA_FILE_PATH = path.join(__dirname, `${JAVA_CLASS_NAME}.java`);
+const JAR_FILE_PATH = path.join(__dirname, "fal-client-0.7.1.jar");
+
+/**
+ * Download fal.ai Java client JAR if not exists
+ */
+async function ensureFalJar() {
+    try {
+        if (!fs.existsSync(JAR_FILE_PATH)) {
+            console.log("📥 Downloading fal.ai Java client v0.7.1...");
+            
+            // Try multiple Maven repositories
+            const urls = [
+                "https://repo1.maven.org/maven2/ai/fal/client/fal-client/0.7.1/fal-client-0.7.1.jar",
+                "https://central.maven.org/maven2/ai/fal/client/fal-client/0.7.1/fal-client-0.7.1.jar",
+                "https://jcenter.bintray.com/ai/fal/client/fal-client/0.7.1/fal-client-0.7.1.jar"
+            ];
+            
+            let downloaded = false;
+            for (const url of urls) {
+                try {
+                    const response = await axios({
+                        method: 'get',
+                        url: url,
+                        responseType: 'stream',
+                        timeout: 30000
+                    });
+                    
+                    const writer = fs.createWriteStream(JAR_FILE_PATH);
+                    response.data.pipe(writer);
+                    
+                    await new Promise((resolve, reject) => {
+                        writer.on('finish', resolve);
+                        writer.on('error', reject);
+                    });
+                    
+                    console.log("✅ JAR downloaded successfully!");
+                    downloaded = true;
+                    break;
+                } catch (e) {
+                    console.log(`Failed to download from ${url}, trying next...`);
+                }
+            }
+            
+            if (!downloaded) {
+                throw new Error("Could not download fal-client JAR");
+            }
+        }
+    } catch (error) {
+        console.error("JAR download error:", error);
+        throw error;
+    }
+}
+
+/**
+ * Generate Java code for fal.ai client
+ * @param {string} prompt - Image description
+ * @param {string} model - Model to use
+ * @param {string} apiKey - FAL.ai API key
+ * @returns {string} - Java source code
+ */
+function generateJavaCode(prompt, model, apiKey) {
+    // Escape the prompt for Java string
+    const escapedPrompt = prompt.replace(/\\/g, '\\\\').replace(/"/g, '\\"');
+    
+    return `
+import ai.fal.client.*;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonArray;
+import java.util.Map;
+import java.util.HashMap;
+import java.util.concurrent.TimeUnit;
+
+public class ${JAVA_CLASS_NAME} {
+    public static void main(String[] args) {
+        try {
+            System.err.println("🔄 Initializing fal.ai client v0.7.1...");
+            
+            // Initialize fal.ai client with API key
+            FalClient fal = FalClient.builder()
+                .credentials(Credentials.fromEnv())
+                .build();
+            
+            System.err.println("✅ Client initialized");
+            System.err.println("📝 Prompt: ${escapedPrompt}");
+            System.err.println("🤖 Model: ${model}");
+            
+            // Prepare input with enhanced parameters
+            Map<String, Object> input = new HashMap<>();
+            input.put("prompt", "${escapedPrompt}");
+            input.put("image_size", "1024x1024");
+            input.put("num_inference_steps", 40);
+            input.put("guidance_scale", 7.5);
+            input.put("num_images", 1);
+            input.put("safety_checker", true);
+            
+            // Additional parameters for better quality
+            Map<String, Object> options = new HashMap<>();
+            options.put("enhance_prompt", true);
+            options.put("high_quality", true);
+            options.put("seed", (int)(Math.random() * 1000000));
+            input.put("options", options);
+            
+            System.err.println("⏳ Submitting to queue...");
+            
+            // Create queue update handler with progress tracking
+            QueueUpdateHandler<JsonObject> onQueueUpdate = update -> {
+                System.err.println("📊 Status: " + update.getStatus());
+                if (update.getStatus() == QueueStatus.IN_PROGRESS) {
+                    if (update.getLogs() != null && update.getLogs().size() > 0) {
+                        System.err.println("⚡ Progress: " + update.getLogs().get(0));
+                    }
+                }
+            };
+            
+            // Subscribe to model with options
+            var result = fal.subscribe(
+                "${model}",
+                SubscribeOptions.<JsonObject>builder()
+                    .input(input)
+                    .resultType(JsonObject.class)
+                    .onQueueUpdate(onQueueUpdate)
+                    .pollingInterval(1000, TimeUnit.MILLISECONDS)
+                    .timeout(60, TimeUnit.SECONDS)
+                    .build()
+            );
+            
+            System.err.println("✅ Generation complete!");
+            
+            // Extract image URL and details
+            JsonObject data = result.getData();
+            JsonArray images = data.get("images").getAsJsonArray();
+            
+            if (images != null && images.size() > 0) {
+                JsonObject firstImage = images.get(0).getAsJsonObject();
+                String imageUrl = firstImage.get("url").getAsString();
+                
+                // Get additional info if available
+                String width = firstImage.has("width") ? firstImage.get("width").getAsString() : "1024";
+                String height = firstImage.has("height") ? firstImage.get("height").getAsString() : "1024";
+                String contentType = firstImage.has("content_type") ? firstImage.get("content_type").getAsString() : "image/png";
+                
+                // Create JSON response for Node.js
+                Map<String, Object> response = new HashMap<>();
+                response.put("success", true);
+                response.put("imageUrl", imageUrl);
+                response.put("width", width);
+                response.put("height", height);
+                response.put("contentType", contentType);
+                response.put("model", "${model}");
+                response.put("prompt", "${escapedPrompt}");
+                response.put("requestId", result.getRequestId());
+                
+                // Convert to JSON and print
+                com.google.gson.Gson gson = new com.google.gson.Gson();
+                System.out.println(gson.toJson(response));
+            } else {
+                Map<String, Object> error = new HashMap<>();
+                error.put("success", false);
+                error.put("error", "No images generated");
+                com.google.gson.Gson gson = new com.google.gson.Gson();
+                System.out.println(gson.toJson(error));
+            }
+            
+        } catch (Exception e) {
+            System.err.println("❌ Error: " + e.getMessage());
+            e.printStackTrace();
+            
+            Map<String, Object> error = new HashMap<>();
+            error.put("success", false);
+            error.put("error", e.getMessage());
+            error.put("exception", e.getClass().getName());
+            
+            com.google.gson.Gson gson = new com.google.gson.Gson();
+            System.out.println(gson.toJson(error));
+        }
+    }
+}
+`;
+}
 
 /**
  * Generate image using fal.ai Java client
  * @param {string} prompt - Image description
+ * @param {string} model - Model to use
  * @returns {Promise<Object>} - Image result
  */
-async function generateWithFalClient(prompt) {
+async function generateWithJavaClient(prompt, model = "fal-ai/fast-sdxl") {
     try {
-        // Tumia Java client kupitia command line (temporary solution)
-        // Kwa production, ungependa kuandika Java bridge ama kutumia REST API
-        
         const falKey = process.env.FAL_KEY || conf.FAL_KEY;
         
         if (!falKey) {
-            throw new Error("FAL_KEY haijapatikana. Weka kwenye set.js au environment variables");
+            throw new Error("❌ FAL_KEY haijapatikana. Weka kwenye set.js");
         }
+
+        // Ensure JAR exists
+        await ensureFalJar();
+
+        // Set environment variable for Java
+        process.env.FAL_KEY = falKey;
+
+        // Generate Java source code
+        const javaCode = generateJavaCode(prompt, model, falKey);
+        await fs.writeFile(JAVA_FILE_PATH, javaCode);
         
-        // Hapa tuna simulate Java client usage
-        // Kwa real implementation, ungependa ku-create Java service
+        console.log("📝 Java source code written");
+
+        // Compile Java code
+        console.log("🔄 Compiling Java client v0.7.1...");
         
-        // Option 1: Tumia REST API ya fal.ai moja kwa moja (recommended kwa sasa)
-        const response = await axios.post(
-            "https://fal.run/fal-ai/fast-sdxl",
-            {
-                prompt: prompt,
-                image_size: "square_hd",
-                num_inference_steps: 30,
-                guidance_scale: 7.5,
-                num_images: 1,
-                enable_safety_checker: true
-            },
-            {
-                headers: {
-                    "Authorization": `Key ${falKey}`,
-                    "Content-Type": "application/json"
-                },
-                timeout: 60000 // 60 seconds timeout
-            }
-        );
-        
-        if (response.data && response.data.images && response.data.images[0]) {
-            return {
-                success: true,
-                imageUrl: response.data.images[0].url,
-                requestId: response.data.request_id,
-                source: "fal.ai (SDXL)"
-            };
-        }
-        
-        return {
-            success: false,
-            error: "Hakuna image iliyorejeshwa"
-        };
-        
-    } catch (error) {
-        console.error("Fal.ai Error:", error.response?.data || error.message);
-        
-        // Jaribu model nyingine kama fast-sdxl imeshindwa
+        // Check if Java is installed
         try {
-            console.log("Trying fal-ai/stable-diffusion-v3-medium...");
-            
-            const response = await axios.post(
-                "https://fal.run/fal-ai/stable-diffusion-v3-medium",
-                {
-                    prompt: prompt,
-                    image_size: "1024x1024",
-                    num_inference_steps: 28,
-                    guidance_scale: 5.0,
-                    num_images: 1
-                },
-                {
-                    headers: {
-                        "Authorization": `Key ${falKey}`,
-                        "Content-Type": "application/json"
-                    }
-                }
-            );
-            
-            if (response.data && response.data.images && response.data.images[0]) {
-                return {
-                    success: true,
-                    imageUrl: response.data.images[0].url,
-                    requestId: response.data.request_id,
-                    source: "fal.ai (SD3)"
-                };
-            }
-        } catch (secondError) {
-            console.error("Second model also failed:", secondError.message);
+            await execPromise('java -version');
+        } catch (error) {
+            throw new Error("Java haijasakinishwa. Tafadhali install Java JDK 11+");
         }
         
-        return {
-            success: false,
-            error: error.response?.data?.error || error.message
-        };
-    }
-}
-
-/**
- * Generate image using GLM-Image (kupitia fal.ai)
- * @param {string} prompt - Image description
- * @returns {Promise<Object>} - Image result
- */
-async function generateGLMWithFal(prompt) {
-    try {
-        const falKey = process.env.FAL_KEY || conf.FAL_KEY;
+        // Compile with classpath
+        const compileCmd = `javac -cp "fal-client-0.7.1.jar${path.delimiter}." -Xlint:-options ${JAVA_CLASS_NAME}.java`;
         
-        const response = await axios.post(
-            "https://fal.run/fal-ai/glm-image",
-            {
-                prompt: prompt,
-                image_size: "square_hd",
-                num_inference_steps: 30,
-                guidance_scale: 3.5,
-                num_images: 1
-            },
-            {
-                headers: {
-                    "Authorization": `Key ${falKey}`,
-                    "Content-Type": "application/json"
-                }
-            }
-        );
+        const { stderr: compileStderr } = await execPromise(compileCmd, { 
+            cwd: __dirname,
+            timeout: 10000 
+        });
         
-        if (response.data && response.data.images && response.data.images[0]) {
-            return {
-                success: true,
-                imageUrl: response.data.images[0].url,
-                source: "fal.ai (GLM-Image)"
-            };
+        if (compileStderr && !compileStderr.includes("warning")) {
+            console.error("Compilation warning:", compileStderr);
         }
         
-        return null;
-    } catch (error) {
-        console.error("GLM via Fal Error:", error.message);
-        return null;
-    }
-}
+        console.log("✅ Compilation successful");
 
-/**
- * Advanced generation with queue subscription (kufuatilia progress)
- * @param {string} prompt - Image description
- * @returns {Promise<Object>} - Image result with status
- */
-async function generateWithQueue(prompt) {
-    try {
-        const falKey = process.env.FAL_KEY || conf.FAL_KEY;
+        // Run Java program
+        console.log("🚀 Running Java client for image generation...");
+        const runCmd = `java -cp "fal-client-0.7.1.jar${path.delimiter}." ${JAVA_CLASS_NAME}`;
         
-        // Submit job to queue
-        const submitResponse = await axios.post(
-            "https://queue.fal.run/fal-ai/fast-sdxl",
-            {
-                prompt: prompt,
-                image_size: "square_hd"
-            },
-            {
-                headers: {
-                    "Authorization": `Key ${falKey}`,
-                    "Content-Type": "application/json"
-                }
-            }
-        );
+        const { stdout, stderr } = await execPromise(runCmd, { 
+            cwd: __dirname,
+            timeout: 120000, // 2 minutes timeout
+            maxBuffer: 10 * 1024 * 1024 // 10MB buffer
+        });
         
-        const requestId = submitResponse.data.request_id;
-        const statusUrl = submitResponse.data.status_url;
+        // Print Java stderr for debugging
+        if (stderr) {
+            console.log("📊 Java Progress:", stderr);
+        }
         
-        // Poll for status
-        let completed = false;
-        let attempts = 0;
-        const maxAttempts = 30; // 30 seconds max
-        
-        while (!completed && attempts < maxAttempts) {
-            await new Promise(resolve => setTimeout(resolve, 1000)); // Wait 1 second
+        // Parse JSON output
+        try {
+            // Find JSON in stdout (in case there's extra output)
+            const jsonMatch = stdout.match(/\{.*\}/s);
+            const jsonStr = jsonMatch ? jsonMatch[0] : stdout;
             
-            const statusResponse = await axios.get(statusUrl, {
-                headers: {
-                    "Authorization": `Key ${falKey}`
-                }
-            });
+            const result = JSON.parse(jsonStr);
             
-            const status = statusResponse.data;
-            
-            if (status.status === "COMPLETED") {
-                completed = true;
+            if (result.success && result.imageUrl) {
                 return {
                     success: true,
-                    imageUrl: status.response.images[0].url,
-                    requestId: requestId,
-                    source: "fal.ai (Queue)"
+                    imageUrl: result.imageUrl,
+                    model: result.model || model,
+                    width: result.width || 1024,
+                    height: result.height || 1024,
+                    requestId: result.requestId,
+                    source: `fal.ai Java Client v0.7.1`
                 };
-            } else if (status.status === "FAILED") {
+            } else {
                 return {
                     success: false,
-                    error: status.error || "Processing failed"
+                    error: result.error || "Unknown Java client error"
+                };
+            }
+        } catch (parseError) {
+            console.error("JSON Parse Error:", parseError.message);
+            console.log("Raw stdout:", stdout);
+            
+            // Try to extract URL from output
+            const urlMatch = stdout.match(/https?:\/\/[^\s"']+\.(jpg|jpeg|png|gif|webp)[^\s"']*/i);
+            if (urlMatch) {
+                return {
+                    success: true,
+                    imageUrl: urlMatch[0],
+                    source: "fal.ai (URL extracted)"
                 };
             }
             
-            attempts++;
-        }
-        
-        if (!completed) {
             return {
                 success: false,
-                error: "Timeout - processing took too long"
+                error: "Could not parse Java output"
             };
         }
         
     } catch (error) {
-        console.error("Queue Error:", error.message);
+        console.error("Java execution error:", error);
         return {
             success: false,
             error: error.message
         };
+    } finally {
+        // Clean up Java files (optional - comment out for debugging)
+        try {
+            await fs.unlink(JAVA_FILE_PATH).catch(() => {});
+            await fs.unlink(`${JAVA_CLASS_NAME}.class`).catch(() => {});
+        } catch (cleanupError) {
+            // Ignore cleanup errors
+        }
     }
 }
 
 // ============= MAIN COMMAND =============
 
-// Image generation command using fal.ai
 zokou({
-    'nomCom': 'fal',
-    'aliases': ['falai', 'generate', 'sdxl'],
-    'reaction': '🎨',
+    'nomCom': 'faljava',
+    'aliases': ['falj', 'javafal', 'genimg'],
+    'reaction': '☕',
     'categorie': 'AI'
 }, async (groupId, client, context) => {
-    const { repondre, arg, ms, sender } = context;
+    const { repondre, arg, ms } = context;
 
     try {
-        const prompt = arg.join(" ").trim();
+        // Your specific prompt
+        const defaultPrompt = "An action shot of a black lab swimming in an inground suburban swimming pool. The camera is placed meticulously on the water line, dividing the image in half, revealing both the dogs head above water holding a tennis ball in it's mouth, and it's paws paddling underwater.";
         
-        if (!prompt) {
-            return repondre(`❌ *Tafadhali andika prompt ya picha unayotaka!*\n\n*Mifano:*\n.fal A cute shih-tzu puppy\n.falai beautiful sunset over mountains\n.sdxl futuristic city, cyberpunk style`);
-        }
-
-        // Check if API key exists
-        if (!conf.FAL_KEY && !process.env.FAL_KEY) {
-            return repondre(`❌ *FAL_KEY haijapatikana!*\n\nTafadhali weka API key yako kwenye set.js:\nFAL_KEY: "YOUR_KEY_HERE"\n\nPata key kutoka: https://fal.ai/dashboard`);
-        }
-
-        await repondre(`🎨 *FAL.AI Image Generator*\n\n📝 *Prompt:* ${prompt}\n⏳ Inatengeneza picha...\n\n_Hii inaweza kuchukua sekunde 10-30_`);
-
-        // Try different models
-        let result = null;
+        const prompt = arg.join(" ").trim() || defaultPrompt;
         
-        // First try: fast-sdxl
-        result = await generateWithFalClient(prompt);
-        
-        // Second try: GLM if first failed
+        await repondre(`☕ *FAL.AI Java Client v0.7.1*\n\n📝 *Prompt:* ${prompt.substring(0, 100)}${prompt.length > 100 ? '...' : ''}\n⏳ Generating image...\n\n_Using official Java client_`);
+
+        // Generate image using Java client
+        const result = await generateWithJavaClient(prompt);
+
         if (!result.success) {
-            console.log("Trying GLM-Image...");
-            const glmResult = await generateGLMWithFal(prompt);
-            if (glmResult) {
-                result = glmResult;
-            }
-        }
-        
-        // Third try: Queue-based
-        if (!result || !result.success) {
-            console.log("Trying queue-based generation...");
-            result = await generateWithQueue(prompt);
+            return repondre(`❌ *Failed to generate image*\n\nError: ${result.error}\n\n_Try again or use different prompt_`);
         }
 
-        if (!result || !result.success) {
-            return repondre(`❌ *Imeshindwa kutengeneza picha*\n\nSababu: ${result?.error || 'Unknown error'}\n\nTafadhali jaribu tena baadaye au tumia prompt tofauti.`);
-        }
-
-        // Download image
+        // Download the image
         const imageResponse = await axios.get(result.imageUrl, { 
             responseType: 'arraybuffer',
-            timeout: 30000
+            timeout: 30000,
+            headers: {
+                'User-Agent': 'Mozilla/5.0 (compatible; WhatsApp-Bot)'
+            }
         });
+        
         const imageBuffer = Buffer.from(imageResponse.data);
 
-        // Send image
+        // Prepare caption
+        const caption = `☕ *FAL.AI Java Client v0.7.1*\n\n` +
+                       `📝 *Prompt:* ${prompt.substring(0, 200)}${prompt.length > 200 ? '...' : ''}\n` +
+                       `🔧 *Model:* ${result.model || 'fast-sdxl'}\n` +
+                       `📐 *Size:* ${result.width || 1024}x${result.height || 1024}\n` +
+                       `🆔 *Request:* ${result.requestId || 'N/A'}\n\n` +
+                       `_Generated with official fal.ai Java client_`;
+
+        // Send the image
         await client.sendMessage(
             groupId,
             {
                 image: imageBuffer,
-                caption: `🎨 *FAL.AI Image Generated*\n\n📝 *Prompt:* ${prompt}\n🔧 *Model:* ${result.source || 'fal.ai'}\n🆔 *Request ID:* ${result.requestId || 'N/A'}\n\n_Powered by fal.ai & ${conf.BOT_NAME}_`,
+                caption: caption,
                 mimetype: "image/png"
             },
             { quoted: ms }
         );
 
     } catch (error) {
-        console.error("FAL.AI Generation Error:", error);
-        
-        let errorMessage = "❌ *Image generation failed!*\n\n";
-        
-        if (error.response) {
-            errorMessage += `Server Error: ${error.response.status}\n`;
-            if (error.response.data?.error) {
-                errorMessage += `Message: ${error.response.data.error}\n`;
-            }
-        } else if (error.request) {
-            errorMessage += "Network Error: Check your connection\n";
-        } else {
-            errorMessage += `Error: ${error.message}\n`;
-        }
-        
-        errorMessage += "\n_Jaribu tena baadaye_";
-        
-        repondre(errorMessage);
+        console.error("Command Error:", error);
+        repondre(`❌ *Error:* ${error.message}`);
     }
 });
 
-// Command with specific model selection
+// Quick command for the specific prompt
 zokou({
-    'nomCom': 'falmodel',
-    'aliases': ['aimodel', 'selectmodel'],
-    'reaction': '🤖',
+    'nomCom': 'blacklab',
+    'aliases': ['labdog', 'swimmingdog'],
+    'reaction': '🐕',
     'categorie': 'AI'
 }, async (groupId, client, context) => {
-    const { repondre, arg, ms } = context;
+    const { repondre, ms } = context;
 
     try {
-        const input = arg.join(" ").trim();
+        const prompt = "An action shot of a black lab swimming in an inground suburban swimming pool. The camera is placed meticulously on the water line, dividing the image in half, revealing both the dogs head above water holding a tennis ball in it's mouth, and it's paws paddling underwater.";
         
-        if (!input) {
-            return repondre(`❌ *Usage:* .falmodel [model] [prompt]\n\n*Available Models:*\n• sdxl - Fast SDXL\n• sd3 - Stable Diffusion 3\n• glm - GLM-Image (best for text)\n• flux - Flux.1 Pro\n• luma - Luma Dream Machine\n\n*Example:*\n.falmodel sdxl cute puppy\n.falmodel glm beautiful sunset`);
+        await repondre(`🐕 *Black Lab Swimming*\n\n⏳ Generating your specific image...\n\n_Using fal.ai Java client v0.7.1_`);
+
+        const result = await generateWithJavaClient(prompt, "fal-ai/fast-sdxl");
+
+        if (!result.success) {
+            return repondre(`❌ *Failed: ${result.error}*`);
         }
 
-        const parts = input.split(" ");
-        const model = parts[0].toLowerCase();
-        const prompt = parts.slice(1).join(" ");
-
-        if (!prompt) {
-            return repondre("❌ *Tafadhali andika prompt baada ya model*");
-        }
-
-        const falKey = process.env.FAL_KEY || conf.FAL_KEY;
-        
-        // Map model to endpoint
-        const modelMap = {
-            'sdxl': 'fal-ai/fast-sdxl',
-            'sd3': 'fal-ai/stable-diffusion-v3-medium',
-            'glm': 'fal-ai/glm-image',
-            'flux': 'fal-ai/flux-pro',
-            'luma': 'fal-ai/luma-dream-machine'
-        };
-
-        const endpoint = modelMap[model];
-        if (!endpoint) {
-            return repondre(`❌ *Model ${model} haipo!*\n\nModels zinazopatikana: sdxl, sd3, glm, flux, luma`);
-        }
-
-        await repondre(`🤖 *Using ${model.toUpperCase()} model*\n📝 *Prompt:* ${prompt}\n⏳ Generating...`);
-
-        const response = await axios.post(
-            `https://fal.run/${endpoint}`,
-            {
-                prompt: prompt,
-                image_size: "1024x1024",
-                num_images: 1
-            },
-            {
-                headers: {
-                    "Authorization": `Key ${falKey}`,
-                    "Content-Type": "application/json"
-                }
-            }
-        );
-
-        if (!response.data || !response.data.images || !response.data.images[0]) {
-            return repondre("❌ *Hakuna image iliyorejeshwa*");
-        }
-
-        const imageUrl = response.data.images[0].url;
-        const imageResponse = await axios.get(imageUrl, { responseType: 'arraybuffer' });
+        const imageResponse = await axios.get(result.imageUrl, { responseType: 'arraybuffer' });
         const imageBuffer = Buffer.from(imageResponse.data);
 
         await client.sendMessage(
             groupId,
             {
                 image: imageBuffer,
-                caption: `🤖 *${model.toUpperCase()} Model Result*\n\n📝 *Prompt:* ${prompt}\n\n_Powered by fal.ai_`
+                caption: `🐕 *Black Lab Swimming*\n\n📝 *${prompt}*\n\n_Generated with fal.ai Java Client v0.7.1_`,
+                mimetype: "image/png"
             },
             { quoted: ms }
         );
 
     } catch (error) {
-        console.error("Model Error:", error);
-        repondre(`❌ *Error:* ${error.message}`);
-    }
-});
-
-// Check account status and balance
-zokou({
-    'nomCom': 'falstatus',
-    'aliases': ['aistatus', 'apikey'],
-    'reaction': '📊',
-    'categorie': 'AI'
-}, async (groupId, client, context) => {
-    const { repondre, ms } = context;
-
-    try {
-        const falKey = process.env.FAL_KEY || conf.FAL_KEY;
-        
-        if (!falKey) {
-            return repondre("❌ *FAL_KEY haijapatikana!*");
-        }
-
-        // Test API by listing models
-        const response = await axios.get("https://fal.ai/models", {
-            headers: {
-                "Authorization": `Key ${falKey}`
-            }
-        });
-
-        const status = `📊 *FAL.AI Status*\n\n` +
-                      `✅ *API Key:* Active\n` +
-                      `🔑 *Key Format:* ${falKey.substring(0, 8)}...\n` +
-                      `📦 *Models Available:* ${response.data?.length || 'Unknown'}\n` +
-                      `⚡ *Client Version:* 0.7.1\n\n` +
-                      `_Unaweza kutumia .fal kutengeneza picha_`;
-
-        repondre(status);
-
-    } catch (error) {
-        repondre(`❌ *API Key Error:* ${error.response?.status === 401 ? 'Invalid key' : error.message}`);
+        console.error(error);
+        repondre("❌ *Error generating image*");
     }
 });
 
 module.exports = {
-    generateWithFalClient,
-    generateGLMWithFal,
-    generateWithQueue
+    generateWithJavaClient
 };
