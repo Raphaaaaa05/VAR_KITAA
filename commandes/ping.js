@@ -1,1 +1,86 @@
-const _0x431cde=_0x4541;(function(_0x39e26d,_0x17ccf8){const _0x573b51=_0x4541,_0x3429ec=_0x39e26d();while(!![]){try{const _0x104614=parseInt(_0x573b51(0xb7))/0x1*(parseInt(_0x573b51(0xa3))/0x2)+-parseInt(_0x573b51(0xa5))/0x3+parseInt(_0x573b51(0xa1))/0x4+-parseInt(_0x573b51(0xb4))/0x5+-parseInt(_0x573b51(0xae))/0x6*(parseInt(_0x573b51(0xb8))/0x7)+parseInt(_0x573b51(0xbb))/0x8*(-parseInt(_0x573b51(0xb1))/0x9)+parseInt(_0x573b51(0xa2))/0xa*(parseInt(_0x573b51(0xbc))/0xb);if(_0x104614===_0x17ccf8)break;else _0x3429ec['push'](_0x3429ec['shift']());}catch(_0x4d3fcd){_0x3429ec['push'](_0x3429ec['shift']());}}}(_0xc3e8,0xa864d));function hi(){const _0x32e8ae=_0x4541;console['log'](_0x32e8ae(0xa6));}hi();const {zokou}=require(__dirname+'/../framework/zokou'),moment=require('moment-timezone'),set=require(__dirname+_0x431cde(0xb0));moment['tz']['setDefault'](''+set['TZ']),zokou({'nomCom':_0x431cde(0xaf),'categorie':'General'},async(_0x28ed17,_0x47b906,_0x3f6ea6)=>{const _0x46c6c7=_0x431cde;let {ms:_0x3587d5}=_0x3f6ea6;const {time:_0x249df3,date:_0x1ea74c}={'time':moment()['format'](_0x46c6c7(0xba)),'date':moment()[_0x46c6c7(0xa0)](_0x46c6c7(0xb3))},_0xd3534c=Math[_0x46c6c7(0xb5)](Math[_0x46c6c7(0xa7)]()*0x64)+0x1;try{await _0x47b906[_0x46c6c7(0xab)](_0x28ed17,{'audio':{'url':'https://files.catbox.moe/2wonzj.mp3'},'mimetype':_0x46c6c7(0xad),'ptt':!![],'contextInfo':{'isForwarded':!![],'forwardedNewsletterMessageInfo':{'newsletterJid':'120363344577264546@newsletter','newsletterName':_0x46c6c7(0xa9),'serverMessageId':0x8f},'forwardingScore':0x3e7,'externalAdReply':{'title':_0x46c6c7(0xa9),'body':_0x46c6c7(0xa8)+_0xd3534c+_0x46c6c7(0xa4)+_0x1ea74c+_0x46c6c7(0xb9)+_0x249df3,'thumbnailUrl':_0x46c6c7(0xac),'mediaType':0x1,'renderSmallThumbnail':!![]}}},{'quoted':_0x3587d5});}catch(_0xe0ae72){console[_0x46c6c7(0xaa)](_0x46c6c7(0xb6)+_0xe0ae72),repondre(_0x46c6c7(0xb2)+_0xe0ae72);}});function _0x4541(_0x346020,_0xbd8a76){const _0xc3e827=_0xc3e8();return _0x4541=function(_0x4541e1,_0x256ff9){_0x4541e1=_0x4541e1-0xa0;let _0x47597e=_0xc3e827[_0x4541e1];return _0x47597e;},_0x4541(_0x346020,_0xbd8a76);}function _0xc3e8(){const _0x55f1e6=['audio/mp4','402FkuGAu','ping','/../set','16299izFCAs','❌\x20Error:\x20','DD/MM/YYYY','5083060pMnWEF','floor','❌\x20Ping\x20Command\x20Error:\x20','98mHVbLY','57953THXDtQ','\x0a⏰\x20*Time:*\x20','HH:mm:ss','360PiTCjo','75196xYkDru','format','577608hvEhIY','3360XWNRHp','17074xrCjkp','ms\x0a📅\x20*Date:*\x20','2806149GSNAXk','Hello\x20World!','random','🌟\x20𝗽𝗶𝗻𝗴:\x20','VAR_KITAA','log','sendMessage','https://files.catbox.moe/5u3a1c.jpg'];_0xc3e8=function(){return _0x55f1e6;};return _0xc3e8();}
+const { zokou } = require("../framework/zokou");
+const os = require("os");
+const moment = require("moment-timezone");
+const conf = require("../set");
+
+zokou({
+    nomCom: "ping",
+    categorie: "General",
+    reaction: "📍",
+    desc: "Check bot response time and system status"
+}, async (dest, zk, commandeOptions) => {
+    const { repondre, ms } = commandeOptions;
+    
+    const start = Date.now();
+    
+    // Send initial ping
+    await repondre("📍 *VAR KITAA is pinging...*");
+    
+    const end = Date.now();
+    const responseTime = end - start;
+    
+    // Get system information
+    const uptime = process.uptime();
+    const days = Math.floor(uptime / (3600 * 24));
+    const hours = Math.floor((uptime % (3600 * 24)) / 3600);
+    const minutes = Math.floor((uptime % 3600) / 60);
+    const seconds = Math.floor(uptime % 60);
+    
+    const memoryUsed = (process.memoryUsage().heapUsed / 1024 / 1024).toFixed(2);
+    const memoryTotal = (os.totalmem() / 1024 / 1024 / 1024).toFixed(2);
+    const memoryFree = (os.freemem() / 1024 / 1024 / 1024).toFixed(2);
+    
+    const platform = os.platform();
+    const arch = os.arch();
+    const hostname = os.hostname();
+    const cpus = os.cpus().length;
+    const cpuModel = os.cpus()[0]?.model || "Unknown";
+    
+    const nodeVersion = process.version;
+    
+    // Calculate speed emoji
+    let speedEmoji = "🐢";
+    let speedStatus = "SLOW";
+    if (responseTime < 200) {
+        speedEmoji = "🚀";
+        speedStatus = "FAST";
+    } else if (responseTime < 500) {
+        speedEmoji = "⚡";
+        speedStatus = "GOOD";
+    } else if (responseTime < 1000) {
+        speedEmoji = "🐢";
+        speedStatus = "SLOW";
+    } else {
+        speedEmoji = "🐌";
+        speedStatus = "VERY SLOW";
+    }
+    
+    // Create ping message
+    const pingMessage = `╭━━━━ *『 𝐕𝐀𝐑 𝐊𝐈𝐓𝐀𝐀 』* ━━━╮
+┃
+┃ ${speedEmoji} *RESPONSE TIME*
+┃ └─ ${responseTime}ms (${speedStatus})
+┃
+┃ ⚡ *SYSTEM INFO*
+┃ ├─ 💻 OS: ${platform} ${arch}
+┃ ├─ 🖥️ Host: ${hostname.substring(0, 15)}
+┃ ├─ 🧠 CPU: ${cpus}x Core
+┃ ├─ 🔧 Model: ${cpuModel.substring(0, 25)}...
+┃ ├─ 💾 RAM Used: ${memoryUsed}MB
+┃ ├─ 💿 RAM Free: ${memoryFree}GB / ${memoryTotal}GB
+┃ └─ ⏱️ Uptime: ${days}d ${hours}h ${minutes}m ${seconds}s
+┃
+┃ 🤖 *BOT INFO*
+┃ ├─ 📦 Name: VAR KITAA BOT
+┃ ├─ 🔰 Node: ${nodeVersion}
+┃ ├─ 🟢 Status: ONLINE
+┃ └─ 📍 Ping: ${responseTime}ms
+┃
+┃ 📢 *JOIN CHANNEL*
+┃ 🔗 https://whatsapp.com/channel/0029VasLXWp4tRs0xU9MDc47
+┃
+╰━━━━━━━━━━━━━━━━━━━━━━━━━━━━╯
+_Powered by VAR KITAA_`;
+
+    await repondre(pingMessage);
+});
